@@ -1,6 +1,7 @@
 package net.thornydev;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.Iterator;
 import java.util.SortedSet;
@@ -48,22 +49,26 @@ public class JsonHiveSchema  {
       help();
       System.exit(0);
     }
-    
-    StringBuilder sb = new StringBuilder();
-    BufferedReader br = new BufferedReader( new FileReader(args[0]) );
-    String line;
-    while ( (line = br.readLine()) != null ) {
-      sb.append(line).append("\n");
-    }
-    br.close();
-    
-    String tableName = "x";
-    if (args.length == 2) {
-      tableName = args[1];
-    }
+    try {
+        StringBuilder sb = new StringBuilder();
+        BufferedReader br = new BufferedReader(new FileReader(args[0]));
+        String line;
+        while ((line = br.readLine()) != null) {
+            sb.append(line).append("\n");
+        }
+        br.close();
 
-    JsonHiveSchema schemaWriter = new JsonHiveSchema(tableName);
-    System.out.println(schemaWriter.createHiveSchema(sb.toString()));
+        String tableName = "x";
+        if (args.length == 2) {
+            tableName = args[1];
+        }
+
+        JsonHiveSchema schemaWriter = new JsonHiveSchema(tableName);
+        System.out.println(schemaWriter.createHiveSchema(sb.toString()));
+    }catch (FileNotFoundException e){
+        System.out.println(e);
+        System.exit(0);
+    }
   }
   
   
@@ -98,7 +103,7 @@ public class JsonHiveSchema  {
     while (keys.hasNext()) {
       String k = keys.next();
       sb.append("  ");
-      sb.append(k.toString());
+      sb.append(escapedKey(k));
       sb.append(' ');
       sb.append(valueToHiveSchema(jo.opt(k)));
       sb.append(',').append("\n");
@@ -116,13 +121,17 @@ public class JsonHiveSchema  {
     
     while (keys.hasNext()) {
       String k = keys.next();
-      sb.append(k.toString());
+      sb.append(escapedKey(k));
       sb.append(':');
       sb.append(valueToHiveSchema(o.opt(k)));
       sb.append(", ");
     }
     sb.replace(sb.length() - 2, sb.length(), ">"); // remove last comma
     return sb.toString();
+  }
+
+  private String escapedKey(String key) {
+      return '`' + key.toString() + '`';
   }
 
   private String toHiveSchema(JSONArray a) throws JSONException {
