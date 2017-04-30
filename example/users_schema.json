@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "definitions": {},
+  "id": "http://example.com/example.json",
+  "properties": {
+    "children": {
+      "id": "/properties/children",
+      "items": {
+        "id": "/properties/children/items",
+        "properties": {
+          "name": {
+            "id": "/properties/children/items/properties/name",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "city": {
+      "id": "/properties/city",
+      "properties": {
+        "area": {
+          "id": "/properties/city/properties/area",
+          "type": "integer"
+        },
+        "name": {
+          "id": "/properties/city/properties/name",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "id": {
+      "id": "/properties/id",
+      "type": "integer"
+    },
+    "income": {
+      "id": "/properties/income",
+      "type": "null"
+    },
+    "name": {
+      "id": "/properties/name",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}
