@@ -9,41 +9,137 @@
   <url>http://maven.apache.org</url>
 
   <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.6.1</version>
+          <configuration>
+            <source>1.8</source>
+            <target>1.8</target>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>2.4</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.4</version>
+          <configuration>
+            <descriptorRefs>
+              <descriptorRef>jar-with-dependencies</descriptorRef>
+            </descriptorRefs>
+            <archive>
+              <manifest>
+                <mainClass>net.thornydev.JsonHiveSchema</mainClass>
+              </manifest>
+            </archive>
+          </configuration>
+        </plugin>
+
+        <!-- see: http://moznion.hatenadiary.com/entry/2015/01/22/132829 -->
+        <!-- findbugs の設定 -->
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>findbugs-maven-plugin</artifactId>
+          <version>3.0.0</version>
+          <executions>
+            <execution>
+              <phase>test</phase>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <effort>Max</effort> <!-- ここらへんは好みに応じて -->
+            <threshold>Low</threshold> <!-- ここらへんは好みに応じて -->
+            <failOnError>true</failOnError> <!-- Error が出た時に build failure にする -->
+            <!-- 以下ファイル出力系なのでお好みで -->
+            <xmlOutput>true</xmlOutput>
+            <outputEncoding>UTF-8</outputEncoding>
+            <xmlOutputDirectory>target/site/findbugs</xmlOutputDirectory>
+            <findbugsXmlOutputDirectory>target/site/findbugs</findbugsXmlOutputDirectory>
+          </configuration>
+        </plugin>
+
+        <!-- checkstyle の設定 -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>2.17</version>
+          <executions>
+            <execution>
+              <phase>test</phase>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <!-- checkstyle のポリシーファイルの場所を指定した場合はここに書く．この場合はプロジェクトルートにcheckstyle.xml が置いてある -->
+            <configLocation>checkstyle.xml</configLocation>
+            <violationSeverity>warning</violationSeverity> <!-- warning よりレベルの高い警告を violation にする -->
+            <!-- 以下お好みで -->
+            <encoding>UTF-8</encoding>
+            <consoleOutput>true</consoleOutput>
+            <outputFile>${project.build.directory}/site/checkstyle/checkstyle-result.xml</outputFile>
+          </configuration>
+        </plugin>
+
+      </plugins>
+    </pluginManagement>
+
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-        </configuration>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.4</version>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.4</version>
-        <configuration>
-          <descriptorRefs>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
-          </descriptorRefs>
-          <archive>
-            <manifest>
-              <mainClass>net.thornydev.JsonHiveSchema</mainClass>
-            </manifest>
-          </archive>
-        </configuration>
         <executions>
           <execution>
             <phase>package</phase>
             <goals>
               <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>findbugs-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>test</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>test</phase>
+            <goals>
+              <goal>check</goal>
             </goals>
           </execution>
         </executions>
