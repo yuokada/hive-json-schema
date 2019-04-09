@@ -1,6 +1,23 @@
-apply plugin: 'java'
-apply plugin: 'maven'
+plugins {
+    // Apply the java plugin to add support for Java
+    id 'java'
+    id 'maven'
 
+    // Apply the application plugin to add support for building an application
+    id 'application'
+}
+
+repositories {
+    jcenter()
+    mavenCentral()
+    maven { url "http://repo.maven.apache.org/maven2" }
+}
+
+configurations {
+    provided
+}
+
+mainClassName = 'net.thornydev.JsonHiveSchema'
 group = 'net.thornydev'
 version = '1.0'
 
@@ -9,12 +26,34 @@ description = """json-hive-schema"""
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-repositories {
-     maven { url "http://repo.maven.apache.org/maven2" }
+
+dependencies {
+    // https://mvnrepository.com/artifact/org.json/json
+    compile  group: 'org.json', name: 'json', version: '20180130'
+    provided group: 'org.json', name: 'json', version: '20180130'
+}
+
+compileJava {
+    // see: https://goo.gl/ucJVKq
+    options.encoding = "UTF-8"
+//    options.compilerArgs << "-Xlint:unchecked"
 }
 
 jar {
     manifest {
         attributes 'Main-Class': 'net.thornydev.JsonHiveSchema'
     }
+}
+
+
+def executableBaseName = "json-hive-schema"
+task executableJar(type: Jar, dependsOn: jar)  {
+    archiveName = "${executableBaseName}.jar"
+    manifest {
+        attributes 'Main-Class' : mainClassName
+    }
+
+    from configurations.compile.collect {it.isDirectory() ? it : zipTree(it)}
+    from "$buildDir/classes/java/main"
+    from "$buildDir/resources/main"
 }
