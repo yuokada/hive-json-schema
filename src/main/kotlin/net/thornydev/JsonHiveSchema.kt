@@ -3,8 +3,7 @@ package net.thornydev
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
-import java.io.BufferedReader
-import java.io.FileReader
+import java.io.File
 import java.util.*
 
 /**
@@ -30,13 +29,7 @@ import java.util.*
  * only one JSON file in it.  An optional second argument can be provided to name the Hive table
  * that is generated.
  */
-class JsonHiveSchema {
-    private var tableName = "x"
-
-    constructor() {}
-    constructor(tableName: String) {
-        this.tableName = tableName
-    }
+class JsonHiveSchema(private var tableName: String = "X") {
 
     /**
      * Pass in any valid JSON object and a Hive schema will be returned for it. You should avoid
@@ -183,16 +176,14 @@ class JsonHiveSchema {
                 System.exit(0)
             }
             val sb = StringBuilder()
-            val br = BufferedReader(FileReader(args[0]))
-            var line: String?
-            while (br.readLine().also { line = it } != null) {
-                sb.append(line).append("\n")
+            File(args[0]).readLines(Charsets.UTF_8).forEach{sb.append(it)}
+
+            // Set tableName
+            val tableName = when{
+                args.size == 2 -> args[1]
+                else -> "x"
             }
-            br.close()
-            var tableName = "x"
-            if (args.size == 2) {
-                tableName = args[1]
-            }
+
             val schemaWriter = JsonHiveSchema(tableName)
             println(schemaWriter.createHiveSchema(sb.toString()))
         }
